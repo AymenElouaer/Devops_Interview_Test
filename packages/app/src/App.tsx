@@ -1,6 +1,8 @@
 import React from 'react';
 import { Navigate, Route } from 'react-router-dom';
 import { apiDocsPlugin, ApiExplorerPage } from '@backstage/plugin-api-docs';
+import MyTemplate from './components/myTemplate/MyTemplate';
+import axios from 'axios';
 import {
   CatalogEntityPage,
   CatalogIndexPage,
@@ -34,6 +36,22 @@ import { CatalogGraphPage } from '@backstage/plugin-catalog-graph';
 import { RequirePermission } from '@backstage/plugin-permission-react';
 import { catalogEntityCreatePermission } from '@backstage/plugin-catalog-common/alpha';
 
+const handleSubmit = async (data: {
+  name: string;
+  scenario: string;
+  containerImage: string;
+}) => {
+  // send data to backend
+  try {
+    const response = await axios.post('http://localhost:7007/template', data);
+    console.log('Data sent successfully', response.data);
+
+  } catch (error) {
+    console.error('Error sending the data', error);
+    // Handle error or display an error message to the user.
+  }
+};
+
 const app = createApp({
   apis,
   bindRoutes({ bind }) {
@@ -59,6 +77,8 @@ const routes = (
   <FlatRoutes>
     <Route path="/" element={<Navigate to="catalog" />} />
     <Route path="/catalog" element={<CatalogIndexPage />} />
+    <Route path="/template" element={<MyTemplate onSubmit={handleSubmit} />} />
+
     <Route
       path="/catalog/:namespace/:kind/:name"
       element={<CatalogEntityPage />}
